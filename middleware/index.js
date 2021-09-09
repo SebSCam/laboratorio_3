@@ -82,7 +82,7 @@ function createVM(ip, id) {
 }
 
 setInterval(async () => {
-  const cpu = await exec(
+  await exec(
     "sshpass -p vagrant ssh vagrant@192.168.100.140 grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage}'"
   ,(error, stdout, stderr) => {
     if (error) {
@@ -92,10 +92,11 @@ setInterval(async () => {
     actual_cpu = stdout
     io.emit('cpu', stdout);
     console.log(`stdout: ${stdout}`);
-    console.error(`stderr: ${stderr}`);
   });
+},5000);
 
-  const ram = await exec(`sshpass -p vagrant ssh vagrant@192.168.100.140 free -t | awk 'NR == 2 {print($3/$2*100)}'`
+  setInterval(async() => {
+  await exec("sshpass -p vagrant ssh vagrant@192.168.100.140 free -t | awk 'NR == 2 {print($3/$2*100)}'"
   ,(error, stdout, stderr) => {
     if (error) {
       console.error(`exec error: ${error}`);
@@ -104,7 +105,6 @@ setInterval(async () => {
     actual_ram = stdout
     io.emit('ram', stdout);
     console.log(`stdout: ${stdout}`);
-    console.error(`stderr: ${stderr}`);
   });
 }, 5000);
 
