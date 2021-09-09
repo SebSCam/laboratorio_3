@@ -4,11 +4,6 @@ const cors = require('cors');
 const axios = require('axios');
 const { pool } = require('./database')
 
-app.post('/query',async (req, res)=>{
-    console.log(req)
-    await pool.query(req);
-})
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }))
 
@@ -30,10 +25,9 @@ app.use(cors(
 ));
 
 app.post('/queryC',(req, res)=>{
-    console.log(req);
     console.log(req.body);
-    //console.log(req.body.query)
-    //executeQuery(req.body.query);
+    console.log(req.body.query)
+    executeQuery(req.body.query);
 })
 
 async function executeQuery(query){
