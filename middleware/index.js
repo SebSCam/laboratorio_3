@@ -103,17 +103,24 @@ io.on("connection", (socket) => {
 });
 
 app.post("/query", (req, res) => {
-  axios
-    .post("http://localhost:4000/query", {
-      query: "Fred",
+  assignServer(req, res);
+});
+
+function assignServer(req, res){
+  if (serving_index > server_list.length) {
+    serving_index = 0
+  }else{
+    axios.post('http://'+ server_list[serving_index++] + ':3002/query',{
+     query: 'SELECT * FROM users;'
     })
     .then(function (response) {
       console.log(response);
     })
     .catch(function (error) {
-      console.log(error);
+      console.error(error)
     });
-});
+  }
+}
 
 app.post("/query-out", (req, res) => {
   axios
