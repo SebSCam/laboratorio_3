@@ -25,14 +25,8 @@ app.use(cors(
 ));
 
 app.post('/consulta',(req, res)=>{
-    console.log(req.body);
     console.log(req.body.query)
-    executeQuery(req.body.query);
-})
-
-async function executeQuery(query){
-    console.log(query)
-    const result = await pool.query(query);
+    const result = await pool.query(req.body.query);
     await axios.post('http://localhost:3000/query-out', {
     out: result
   })
@@ -42,6 +36,10 @@ async function executeQuery(query){
   .catch(function (error) {
     console.log(error);
   });
+})
+
+async function executeQuery(query){
+   
 }
 
 app.listen(4000, () => {
