@@ -24,7 +24,7 @@ app.use(cors(
     config.application.cors.server
 ));
 
-app.post('/queryC',(req, res)=>{
+app.post('/consulta',(req, res)=>{
     console.log(req.body);
     console.log(req.body.query)
     executeQuery(req.body.query);
