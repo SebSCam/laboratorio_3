@@ -112,7 +112,7 @@ setInterval(async () => {
       actual_ram = stdout
       cpu.push({'host':server_list[i],
                 'ram': stdout })
-      io.emit('cpu', JSON.stringify(ram));
+      io.emit('ram', JSON.stringify(ram));
       console.log(`cpu:${ram}`);
     })
   }
