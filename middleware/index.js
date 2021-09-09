@@ -107,7 +107,7 @@ app.post("/query", (req, res) => {
 });
 
 function assignServer(req, res){
-  if (serving_index > server_list.length) {
+  if (serving_index >= server_list.length) {
     serving_index = 0
   }else{
     axios.post('http://'+ server_list[serving_index++] + ':3002/query',{
