@@ -6,7 +6,7 @@ const axios = require("axios");
 const cors = require("cors");
 const util = require("util");
 const fs = require("fs")
-const { spawn } = require("child_process");
+const exec = require("child-process-async").exec;
 const io = require("socket.io")(server, {
   cors: {
     origin: "*",
@@ -81,14 +81,14 @@ function createVM(ip, id) {
 }
 
 setInterval(async () => {
-  const cpu = await spawn(
+  const {stdout} = await spawn(
     "sshpass -p vagrant ssh vagrant@192.168.100.140 top -bn1 | grep 'Cpu(s)' | sed 's/.*, *\([0-9.]*\)%* id.*/\1/' | awk '{print 100 - $1}'"
   );
-    cpu.stdout.on("data", (data) => {
-    console.log(`Received chunk ${data}`);
+    // cpu.stdout.("data", (data) => {
+    console.log(`Received chunk ${stdout}`);
     actual_cpu = cpu;
     io.emit("cpu", cpu);
-    });
+    // });
 
     cpu.stderr.on("data", (data)=>{
       console.log(`Received chunk ${data}`);
@@ -144,7 +144,7 @@ app.post('/set', (req, res)=>{
 })
 
 function evaluateNewServer (cpu, ram) {
-  if (actual_cpu >= cpu || actual_ram >= ram) createVM()
+  if (actual_cpu >= cpu || actual_ram >= ram) generateInstanceNetwork()
 }
 
 server.listen(app.get("port"), () => {
