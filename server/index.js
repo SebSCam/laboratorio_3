@@ -5,6 +5,7 @@ const axios = require('axios');
 const { pool } = require('./database')
 
 app.post('/query',async (req, res)=>{
+    console.log(req)
     await pool.query(req);
 })
 
