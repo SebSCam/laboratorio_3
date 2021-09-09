@@ -82,8 +82,7 @@ function createVM(ip, id) {
 
 setInterval(async () => {
   const {stdout} = await exec(
-    "sshpass -p vagrant ssh vagrant@192.168.100.140 awk '{u=$2+$4; t=$2+$4+$5; if (NR==1){u1=u; t1=t} else print ($2+$4-u1) * 100 / (t-t1) }' \
-    <(grep 'cpu ' /proc/stat) <(sleep 1;grep 'cpu ' /proc/stat)"
+    "sshpass -p vagrant ssh vagrant@192.168.100.140 grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage}'"
   );
     // cpu.stdout.("data", (data) => {
     console.log(`Received chunk ${stdout}`);
