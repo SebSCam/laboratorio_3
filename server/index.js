@@ -29,6 +29,9 @@ app.use(cors(
 ));
 
 app.post('/query',(req, res)=>{
+    console.log(req);
+    console.log(req.body);
+    console.log(req.body.query)
     executeQuery(req.body.query);
 })
 
