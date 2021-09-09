@@ -81,8 +81,9 @@ function createVM(ip, id) {
 }
 
 setInterval(async () => {
-  const {stdout} = await spawn(
-    "sshpass -p vagrant ssh vagrant@192.168.100.140 top -bn1 | grep 'Cpu(s)' | sed 's/.*, *\([0-9.]*\)%* id.*/\1/' | awk '{print 100 - $1}'"
+  const {stdout} = await exec(
+    "sshpass -p vagrant ssh vagrant@192.168.100.140 awk '{u=$2+$4; t=$2+$4+$5; if (NR==1){u1=u; t1=t} else print ($2+$4-u1) * 100 / (t-t1) }' \
+    <(grep 'cpu ' /proc/stat) <(sleep 1;grep 'cpu ' /proc/stat)"
   );
     // cpu.stdout.("data", (data) => {
     console.log(`Received chunk ${stdout}`);
@@ -94,12 +95,12 @@ setInterval(async () => {
       console.log(`Received chunk ${data}`);
     })
 
-  const ram = await spawn(`sshpass -p vagrant ssh vagrant@192.168.100.140 free -t | awk 'NR == 2 {print($3/$2*100)}'`);
-  ram.stdout.on("data", (data) => {
-    console.log(`Received chunk ${data}`);
-    actual_ram = ram;
-    io.emit("ram", data);
-  });
+  const {stdout} = await exec(`sshpass -p vagrant ssh vagrant@192.168.100.140 free -t | awk 'NR == 2 {print($3/$2*100)}'`);
+  // ram.stdout.on("data", (data) => {
+    console.log(`Received chunk ${stdout}`);
+    actual_ram = stdout;
+    io.emit("ram", stdout);
+  // });
 }, 5000);
 
 io.on("connection", (socket) => {
