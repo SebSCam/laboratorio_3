@@ -5,7 +5,7 @@ const server = http.createServer(app);
 const axios = require("axios");
 const cors = require("cors");
 const util = require("util");
-const exec = util.promisify(require("child_process").exec);
+const { spawn } = require("child_process");
 const io = require("socket.io")(server, {
   cors: {
     origin: "*",
@@ -79,18 +79,21 @@ function createVM(ip, id) {
   exec("cd src/resources/vm/" + ip + "&& vagrant up --provision");
 }
 
-setInterval(async() => {
-  const cpu = await exec(
-    `sshpass -p vagrant ssh vagrant@192.168.100.140 top -bn1 | grep "Cpu(s)" | \
-    sed "s/.*, *\([0-9.]*\)%* id.*/\1/" | \
-    awk '{print 100 - $1}'`
+setInterval(async () => {
+  const cpu = await spawn(
+    "sshpass -p vagrant ssh vagrant@192.168.100.140 top -bn1 | grep 'Cpu(s)' | sed 's/.*, *\([0-9.]*\)%* id.*/\1/' | awk '{print 100 - $1}'"
   );
-  cpu.stdout.on("data", (data) => {
+    cpu.stdout.on("data", (data) => {
     console.log(`Received chunk ${data}`);
-    actual_cpu = data;
-    io.emit("cpu", data);
-  });
-  const ram = await exec(`sshpass -p vagrant ssh vagrant@192.168.100.140 free -t | awk 'NR == 2 {print($3/$2*100)}'`);
+    actual_cpu = cpu;
+    io.emit("cpu", cpu);
+    });
+
+    cpu.stderr.on("data", (data)=>{
+      console.log(`Received chunk ${data}`);
+    })
+
+  const ram = await spawn(`sshpass -p vagrant ssh vagrant@192.168.100.140 free -t | awk 'NR == 2 {print($3/$2*100)}'`);
   ram.stdout.on("data", (data) => {
     console.log(`Received chunk ${data}`);
     actual_ram = ram;
