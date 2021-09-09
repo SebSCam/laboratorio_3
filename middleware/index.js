@@ -82,30 +82,40 @@ function createVM(ip, id) {
 }
 
 setInterval(async () => {
-  await exec(
-    "sshpass -p vagrant ssh vagrant@192.168.100.140 grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage}'"
-  ,(error, stdout, stderr) => {
-    if (error) {
-      console.error(`exec error: ${error}`);
-      return;
-    }
-    actual_cpu = stdout
-    io.emit('cpu', stdout);
-    console.log(`stdout: ${stdout}`);
-  });
+  var cpu = []
+  for (const i in server_list) {
+    await exec(
+      "sshpass -p vagrant ssh vagrant@"+ server_list[i] + " grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage}'"
+    ,(error, stdout, stderr) => {
+      if (error) {
+        console.error(`exec error: ${error}`);
+        return;
+      }
+      actual_cpu = stdout
+      cpu.push({'host':server_list[i],
+                'cpu': stdout })
+      io.emit('cpu', JSON.stringify(cpu));
+      console.log(`cpu:${cpu}`);
+    });
+  }
 },5000);
 
   setInterval(async() => {
-  await exec("sshpass -p vagrant ssh vagrant@192.168.100.140 free -t | awk 'NR == 2 {print($3/$2*100)}'"
-  ,(error, stdout, stderr) => {
-    if (error) {
-      console.error(`exec error: ${error}`);
-      return;
-    }
-    actual_ram = stdout
-    io.emit('ram', stdout);
-    console.log(`stdout: ${stdout}`);
-  });
+  var ram = []
+  for (const i in server_list) {
+    await exec("sshpass -p vagrant ssh vagrant@"+ server_list[i] + " free -t | awk 'NR == 2 {print($3/$2*100)}'"
+    ,(error, stdout, stderr) => {
+      if (error) {
+        console.error(`exec error: ${error}`);
+        return;
+      }
+      actual_ram = stdout
+      cpu.push({'host':server_list[i],
+                'ram': stdout })
+      io.emit('cpu', JSON.stringify(ram));
+      console.log(`cpu:${ram}`);
+    })
+  }
 }, 5000);
 
 io.on("connection", (socket) => {
