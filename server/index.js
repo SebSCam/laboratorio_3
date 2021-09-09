@@ -2,6 +2,7 @@ const express = require('express')
 const app = express()
 const cors = require('cors');
 const axios = require('axios');
+const mysql = require('mysql')
 var connection = mysql.createConnection({
     host     : 'localhost',
     user     : 'root',
@@ -16,7 +17,6 @@ connection.connect(function(err) {
         console.log(err.fatal);
     }
 });
-
 
 
 app.use(express.json());
@@ -39,30 +39,30 @@ app.use(cors(
     config.application.cors.server
 ));
 
+
 app.post('/consulta',(req, res)=>{
-   connection.query(req.body.query, function(err, rows, fields) {
+console.log(req.body.query)
+       connection.query(req.body.query,function (err, rows, fields) {
     if(err){
         console.log("An error ocurred performing the query.");
-        return;
     }
-    console.log("Consulta ejecutada con éxito:", rows);
-        await axios.post('http://localhost:3000/query-out', {
-    out: result
-  })
-  .then(function (response) {
-    console.log(response);
-  })
-  .catch(function (error) {
-    console.log(error);
-  });
-});
-   
+    console.log("Consulta ejecutada con éxito:", {rows});
+   test(JSON.parse(JSON.stringify(rows)))
+   })
 })
 
-async function executeQuery(query){
-   
+async function test(result){
+console.log(result)
+await axios.post('http://192.168.1.112:3000/query-out',result)
+        .then( function (response){
+        console.log(response)
+        })
+        .catch(function(error){
+        console.log(error)
+        })
 }
 
 app.listen(4000, () => {
     console.log(`Example app listening at http://localhost:4000`)
 })
+
