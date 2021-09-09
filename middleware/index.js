@@ -61,7 +61,7 @@ function createVM(ip, id) {
         "\n sudo mkdir app"+
         "\n cd app"+
         "\n git clone https://github.com/SebSCam/laboratorio_3.git" +
-        "\n cd Laboratorio_3" +
+        "\n cd laboratorio_3" +
         "\n cd server"+
         "\n sudo npm i" +
         "\n sudo npm i -g pm2" +
