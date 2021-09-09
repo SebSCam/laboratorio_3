@@ -55,9 +55,14 @@ function createVM(ip, id) {
         ip +
         '"' +
         '\nconfig.vm.provision "shell", inline: <<-SHELL' +
-        "\n apt-get update\n apt-get upgrades" +
-        "\n git clone " +
-        "\n cd Repositiorio" +
+        "\n apt-get update\n apt-get upgrade" +
+        "\n sudo apt-get install -y mysql-server"+
+        "\n sudo rm app"+
+        "\n sudo mkdir app"+
+        "\n cd app"+
+        "\n git clone https://github.com/SebSCam/laboratorio_3.git" +
+        "\n cd Laboratorio_3" +
+        "\n cd server"+
         "\n sudo npm i" +
         "\n sudo npm i -g pm2" +
         "\n pm2 start index.js" +
