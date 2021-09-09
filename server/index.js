@@ -2,7 +2,22 @@ const express = require('express')
 const app = express()
 const cors = require('cors');
 const axios = require('axios');
-const { pool } = require('./database')
+var connection = mysql.createConnection({
+    host     : 'localhost',
+    user     : 'root',
+    password : '2021SlFj09',
+    database : 'test'
+});
+
+connection.connect(function(err) {
+    // en caso de error
+    if(err){
+        console.log(err.code);
+        console.log(err.fatal);
+    }
+});
+
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }))
@@ -25,9 +40,13 @@ app.use(cors(
 ));
 
 app.post('/consulta',(req, res)=>{
-    console.log(req.body.query)
-    const result = await pool.query(req.body.query);
-    await axios.post('http://localhost:3000/query-out', {
+   connection.query(req.body.query, function(err, rows, fields) {
+    if(err){
+        console.log("An error ocurred performing the query.");
+        return;
+    }
+    console.log("Consulta ejecutada con éxito:", rows);
+        await axios.post('http://localhost:3000/query-out', {
     out: result
   })
   .then(function (response) {
@@ -36,6 +55,8 @@ app.post('/consulta',(req, res)=>{
   .catch(function (error) {
     console.log(error);
   });
+});
+   
 })
 
 async function executeQuery(query){
